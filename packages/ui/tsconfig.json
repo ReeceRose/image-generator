@@ -1,0 +1,11 @@
+{
+	"extends": "../config/base.tsconfig.json",
+	"compilerOptions": {
+		"rootDir": ".",
+		"declarationDir": "dist",
+		"paths": {
+			"@image-generator/ui/*": ["./*"],
+		},
+	},
+	"include": ["."]
+}

@@ -1,0 +1,7 @@
+{
+	"name": "@image-generator/lambda",
+	"version": "0.0.0",
+	"scripts": {
+		"dev": "cargo watch -x run"
+	}
+}

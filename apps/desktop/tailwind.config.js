@@ -1,0 +1,1 @@
+module.exports = require('@image-generator/ui/tailwind.config');
