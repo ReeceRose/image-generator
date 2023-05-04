@@ -5,6 +5,7 @@
 		"build": {},
 		"lint": {},
 		"start": {},
+		"test": {},
 		"dev": {
 			"cache": false,
 			"persistent": true

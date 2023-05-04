@@ -1,7 +1,5 @@
 import { BaseClient } from '@image-generator/client/';
-import { useEffect } from 'react';
 import Button from './Components/Button';
-import Input from './Components/Forms/Input';
 import Textarea from './Components/Forms/TextArea';
 import Layout from './Layouts';
 
