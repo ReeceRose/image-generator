@@ -1,32 +1,39 @@
 use std::net::SocketAddr;
 
-use image_generator_core::hello;
+use axum::extract::State;
+use axum::routing::post;
+// use image_generator_core::hello;
 
-use axum::{extract::Query, response::Json, routing::get, Router};
+use axum::{extract::Json, Router};
+use image_generator_core::GenerateImageRequest;
 use lambda_http::Error;
 use lambda_web::{is_running_on_lambda, run_hyper_on_lambda};
-use serde::Deserialize;
 use serde_json::{json, Value};
 use tower_http::cors::{Any, CorsLayer};
 use tower_http::trace::{self, TraceLayer};
 use tracing::Level;
 
-#[derive(Debug, Deserialize)]
-struct Request {
-    name: Option<String>,
+async fn generate_image(
+    State(state): State<AppState>,
+    Json(request): Json<GenerateImageRequest>,
+) -> Json<Value> {
+    let response = image_generator_core::generate_image(&request, state.apikey).await;
+    match response {
+        Ok(data) => Json(json!(data)),
+        Err(err) => Json(json!(err)),
+    }
 }
 
-async fn root(Query(request): Query<Request>) -> Json<Value> {
-    let name = request.name.unwrap_or("world".to_owned());
-
-    Json(json!({ "msg": hello(&name) }))
-}
-
-pub async fn fallback(uri: axum::http::Uri) -> impl axum::response::IntoResponse {
+async fn fallback(uri: axum::http::Uri) -> impl axum::response::IntoResponse {
     (
         axum::http::StatusCode::NOT_FOUND,
         format!("No route {}", uri.path()),
     )
+}
+
+#[derive(Clone)]
+struct AppState {
+    apikey: String,
 }
 
 #[tokio::main]
@@ -40,10 +47,16 @@ async fn main() -> Result<(), Error> {
 
     let cors = CorsLayer::new().allow_origin(Any);
 
+    let apikey = match std::env::var_os("OPENAPI_KEY") {
+        Some(v) => v.into_string().unwrap(),
+        None => panic!("OPENAPI_KEY is not set"),
+    };
+
+    let state = AppState { apikey };
     // TODO: remove once full-domain is in-place
-    let routes = Router::new().route("/", get(root));
+    let routes = Router::new().route("/", post(generate_image));
     let app = Router::new()
-        .route("/", get(root))
+        .route("/", post(generate_image))
         .nest("/production/", routes)
         .layer(cors)
         .layer(
@@ -51,7 +64,8 @@ async fn main() -> Result<(), Error> {
                 .make_span_with(trace::DefaultMakeSpan::new().level(Level::INFO))
                 .on_response(trace::DefaultOnResponse::new().level(Level::INFO)),
         )
-        .fallback(fallback);
+        .fallback(fallback)
+        .with_state(state);
 
     if is_running_on_lambda() {
         run_hyper_on_lambda(app).await?;
