@@ -1,3 +1,28 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+@layer base {
+  :root {
+    --color-brand: 42 82 190;
+  }
+
+  html {
+    @apply bg-body font-body;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html.dark {
+    @apply text-white bg-dark;
+  }
+
+  html,
+  body {
+    @apply antialiased;
+  }
+
+  .inline-block svg {
+    @apply w-8 h-8;
+  }
+}
