@@ -11,7 +11,11 @@ coverage
 # js
 out/
 build
+dist/
+apps/web/dist/
+apps/desktop/dist
 .eslintcache
+tsconfig.tsbuildinfo
 
 # misc
 .DS_Store
@@ -34,4 +38,3 @@ yarn-error.log*
 
 # rust
 target/
-apps/web/dist/

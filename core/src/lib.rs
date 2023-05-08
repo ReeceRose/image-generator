@@ -81,7 +81,3 @@ pub async fn generate_image(
         return Err(GenerateImageError::new("Non 200 error response"));
     }
 }
-
-pub fn hello(name: &str) -> String {
-    format!("Hello {name}!")
-}

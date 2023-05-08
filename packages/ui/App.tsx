@@ -2,7 +2,7 @@ import { BaseClient } from '@image-generator/client/';
 import { GenerateImageSize, Image } from '@image-generator/client/types';
 import { useState } from 'react';
 import Button from './Components/Button';
-import Input from './Components/Forms/Input';
+import PrivateInput from './Components/Forms/PrivateInput';
 import Textarea from './Components/Forms/TextArea';
 import Spinner from './Components/Spinner';
 import Layout from './Layouts';
@@ -83,7 +83,7 @@ function App({ client }: AppProps) {
 						.
 					</p>
 					<div className="flex w-full flex-row items-center">
-						<Input setMessage={(key) => setOpenAIKey(key)} placeholder="API Key" />
+						<PrivateInput setMessage={(key) => setOpenAIKey(key)} placeholder="API Key" />
 					</div>
 				</div>
 				<div className="mb-6 rounded-lg bg-white p-5 shadow-card transition-shadow duration-200 hover:shadow-large dark:bg-light-dark xs:p-6 xs:pb-8">
