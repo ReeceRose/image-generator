@@ -1,18 +1,13 @@
-import { forwardRef } from 'react';
-
-type TextareaProps = React.DetailedHTMLProps<
-	React.TextareaHTMLAttributes<HTMLTextAreaElement>,
-	HTMLTextAreaElement
-> & {
+type Props = {
+	setMessage: (value: string) => void;
 	label?: string;
+	placeholder?: string;
 	error?: string;
-	className?: string;
-	inputClassName?: string;
 };
 
-const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
-	({ label, error, className, inputClassName, ...props }, ref) => (
-		<div className={'text-xs sm:text-sm ' + className}>
+export default function Textarea({ setMessage, label, placeholder, error }: Props) {
+	return (
+		<div className="text-xs sm:text-sm">
 			<label>
 				{label && (
 					<span className="mb-2 block font-medium uppercase tracking-widest dark:text-gray-100 sm:mb-3">
@@ -21,12 +16,9 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
 					</span>
 				)}
 				<textarea
-					ref={ref}
-					{...props}
-					className={
-						'mt-1 block h-24 w-full rounded-md border border-gray-200 bg-white px-4 py-3 text-sm placeholder-gray-400 transition-shadow duration-200  invalid:border-red-500 invalid:text-red-600 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:invalid:border-red-500 focus:invalid:ring-red-500 disabled:border-gray-200 disabled:bg-gray-50 disabled:text-gray-500 dark:border-gray-700 dark:bg-light-dark dark:text-gray-100 dark:focus:border-gray-600 dark:focus:ring-gray-600 sm:h-28 sm:rounded-lg ' +
-						inputClassName
-					}
+					placeholder={placeholder}
+					onChange={(e) => setMessage(e.target.value)}
+					className="mt-1 block h-24 w-full rounded-md border border-gray-200 bg-white px-4 py-3 text-sm transition-shadow duration-200 placeholder:text-gray-400 invalid:border-red-500 invalid:text-red-600 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:invalid:border-red-500 focus:invalid:ring-red-500 disabled:border-gray-200 disabled:bg-gray-50 disabled:text-gray-500 dark:border-gray-700 dark:bg-light-dark dark:text-gray-100 dark:focus:border-gray-600 dark:focus:ring-gray-600 sm:h-28 sm:rounded-lg md:h-32 xl:h-36"
 				/>
 			</label>
 			{error && (
@@ -35,8 +27,5 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
 				</span>
 			)}
 		</div>
-	)
-);
-
-Textarea.displayName = 'Textarea';
-export default Textarea;
+	);
+}

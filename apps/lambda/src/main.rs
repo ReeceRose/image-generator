@@ -1,8 +1,6 @@
 use std::net::SocketAddr;
 
-use axum::extract::State;
 use axum::routing::post;
-// use image_generator_core::hello;
 
 use axum::{extract::Json, Router};
 use image_generator_core::GenerateImageRequest;
@@ -13,11 +11,8 @@ use tower_http::cors::{Any, CorsLayer};
 use tower_http::trace::{self, TraceLayer};
 use tracing::Level;
 
-async fn generate_image(
-    State(state): State<AppState>,
-    Json(request): Json<GenerateImageRequest>,
-) -> Json<Value> {
-    let response = image_generator_core::generate_image(&request, state.apikey).await;
+async fn generate_image(Json(request): Json<GenerateImageRequest>) -> Json<Value> {
+    let response = image_generator_core::generate_image(&request).await;
     match response {
         Ok(data) => Json(json!(data)),
         Err(err) => Json(json!(err)),
@@ -31,11 +26,6 @@ async fn fallback(uri: axum::http::Uri) -> impl axum::response::IntoResponse {
     )
 }
 
-#[derive(Clone)]
-struct AppState {
-    apikey: String,
-}
-
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     tracing_subscriber::fmt()
@@ -45,15 +35,8 @@ async fn main() -> Result<(), Error> {
         .without_time()
         .init();
 
-    let cors = CorsLayer::new().allow_origin(Any);
+    let cors = CorsLayer::new().allow_origin(Any).allow_headers(Any);
 
-    let apikey = match std::env::var_os("OPENAPI_KEY") {
-        Some(v) => v.into_string().unwrap(),
-        None => panic!("OPENAPI_KEY is not set"),
-    };
-
-    let state = AppState { apikey };
-    // TODO: remove once full-domain is in-place
     let routes = Router::new().route("/", post(generate_image));
     let app = Router::new()
         .route("/", post(generate_image))
@@ -64,8 +47,7 @@ async fn main() -> Result<(), Error> {
                 .make_span_with(trace::DefaultMakeSpan::new().level(Level::INFO))
                 .on_response(trace::DefaultOnResponse::new().level(Level::INFO)),
         )
-        .fallback(fallback)
-        .with_state(state);
+        .fallback(fallback);
 
     if is_running_on_lambda() {
         run_hyper_on_lambda(app).await?;

@@ -1,12 +1,33 @@
 use serde::{Deserialize, Serialize};
 
 // TODO: use &str in structs?
+
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct GenerateImageRequest {
+    pub api_key: String,
     pub prompt: String,
-    pub n: u8,
+    pub image_count: u8,
     pub size: String,
 }
+
+#[derive(Serialize, Debug)]
+pub struct OpenAIGenerateImageRequest {
+    prompt: String,
+    n: u8,
+    size: String,
+}
+
+impl From<&GenerateImageRequest> for OpenAIGenerateImageRequest {
+    fn from(value: &GenerateImageRequest) -> Self {
+        OpenAIGenerateImageRequest {
+            prompt: value.prompt.to_owned(),
+            n: value.image_count,
+            size: value.size.to_owned(),
+        }
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GenerateImageResponse {
     data: Option<Vec<URL>>,
@@ -33,14 +54,13 @@ pub struct URL {
 
 pub async fn generate_image(
     request: &GenerateImageRequest,
-    apikey: String,
 ) -> Result<GenerateImageResponse, GenerateImageError> {
     let client = reqwest::Client::new();
     let res = client
         .post("https://api.openai.com/v1/images/generations")
         .header("Content-Type", "application/json")
-        .header("Authorization", format!("Bearer {}", apikey))
-        .json(request)
+        .header("Authorization", format!("Bearer {}", request.api_key))
+        .json(&OpenAIGenerateImageRequest::from(request))
         .send()
         .await;
     let response = match res {

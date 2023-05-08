@@ -3,16 +3,20 @@
     windows_subsystem = "windows"
 )]
 
-use image_generator_core::hello;
+use image_generator_core::{
+    generate_image as create_image, GenerateImageError, GenerateImageRequest, GenerateImageResponse,
+};
 
 #[tauri::command]
-fn hello_wrapper(name: &str) -> String {
-    return hello(name);
+async fn generate_image(
+    request: GenerateImageRequest,
+) -> Result<GenerateImageResponse, GenerateImageError> {
+    create_image(&request).await
 }
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![hello_wrapper])
+        .invoke_handler(tauri::generate_handler![generate_image])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

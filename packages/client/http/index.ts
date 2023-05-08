@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import { BaseClient } from '../';
+import { GenerateImageError, GenerateImageRequest, GenerateImageResponse } from '../types';
 
 export class HTTPClient extends BaseClient {
 	client: AxiosInstance;
@@ -11,8 +12,16 @@ export class HTTPClient extends BaseClient {
 		});
 	}
 
-	async hello(name?: string | undefined): Promise<string> {
-		const response = await this.client.get('/?name=' + (name || 'world'));
-		return response.data.msg;
+	async generate_image(request: GenerateImageRequest): Promise<GenerateImageResponse> {
+		try {
+			const response = await this.client.post('/', request);
+			return response.data;
+		} catch (err) {
+			const error = err as GenerateImageError;
+			return {
+				data: [],
+				error: error
+			};
+		}
 	}
 }
