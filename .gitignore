@@ -15,7 +15,7 @@ dist/
 apps/web/dist/
 apps/desktop/dist
 .eslintcache
-tsconfig.tsbuildinfo
+**/tsconfig.tsbuildinfo
 
 # misc
 .DS_Store
