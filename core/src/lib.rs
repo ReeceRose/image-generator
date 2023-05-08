@@ -30,9 +30,17 @@ impl From<&GenerateImageRequest> for OpenAIGenerateImageRequest {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GenerateImageResponse {
-    data: Option<Vec<URL>>,
-    error: Option<GenerateImageError>,
+    pub data: Option<Vec<URL>>,
+    pub error: Option<GenerateImageError>,
 }
+
+impl GenerateImageResponse {
+    fn new(data: Option<Vec<URL>>, error: Option<GenerateImageError>) -> GenerateImageResponse {
+        GenerateImageResponse { data, error }
+    }
+}
+
+// TODO: use a new in the above
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GenerateImageError {
@@ -40,10 +48,8 @@ pub struct GenerateImageError {
 }
 
 impl GenerateImageError {
-    fn new(msg: &str) -> GenerateImageError {
-        GenerateImageError {
-            message: msg.to_string(),
-        }
+    fn new(message: String) -> Self {
+        GenerateImageError { message }
     }
 }
 
@@ -52,9 +58,7 @@ pub struct URL {
     url: String,
 }
 
-pub async fn generate_image(
-    request: &GenerateImageRequest,
-) -> Result<GenerateImageResponse, GenerateImageError> {
+pub async fn generate_image(request: &GenerateImageRequest) -> GenerateImageResponse {
     let client = reqwest::Client::new();
     let res = client
         .post("https://api.openai.com/v1/images/generations")
@@ -65,19 +69,34 @@ pub async fn generate_image(
         .await;
     let response = match res {
         Ok(response) => response,
-        _ => return Err(GenerateImageError::new("Failed to make request")),
+        _ => {
+            return GenerateImageResponse::new(
+                None,
+                Some(GenerateImageError::new(
+                    "Failed to make request to OpenAI".to_owned(),
+                )),
+            )
+        }
     };
     if let reqwest::StatusCode::OK = response.status() {
         let json = response.json::<GenerateImageResponse>().await;
-        let data = match json {
-            Ok(data) => data,
+        match json {
+            Ok(data) => return data,
             _ => {
-                return Err(GenerateImageError::new("Failed to deserialize response."));
+                return GenerateImageResponse::new(
+                    None,
+                    Some(GenerateImageError::new(
+                        "Failed to deserialize response.".to_owned(),
+                    )),
+                )
             }
         };
-        return Ok(data);
     } else {
-        println!("FAIL {:?}", response);
-        return Err(GenerateImageError::new("Non 200 error response"));
+        return GenerateImageResponse::new(
+            None,
+            Some(GenerateImageError::new(
+                "Non 200 error code from OpenAI.".to_owned(),
+            )),
+        );
     }
 }

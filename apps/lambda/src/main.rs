@@ -13,10 +13,7 @@ use tracing::Level;
 
 async fn generate_image(Json(request): Json<GenerateImageRequest>) -> Json<Value> {
     let response = image_generator_core::generate_image(&request).await;
-    match response {
-        Ok(data) => Json(json!(data)),
-        Err(err) => Json(json!(err)),
-    }
+    Json(json!(response))
 }
 
 async fn fallback(uri: axum::http::Uri) -> impl axum::response::IntoResponse {

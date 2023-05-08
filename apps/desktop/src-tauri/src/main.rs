@@ -4,13 +4,11 @@
 )]
 
 use image_generator_core::{
-    generate_image as create_image, GenerateImageError, GenerateImageRequest, GenerateImageResponse,
+    generate_image as create_image, GenerateImageRequest, GenerateImageResponse,
 };
 
 #[tauri::command]
-async fn generate_image(
-    request: GenerateImageRequest,
-) -> Result<GenerateImageResponse, GenerateImageError> {
+async fn generate_image(request: GenerateImageRequest) -> GenerateImageResponse {
     create_image(&request).await
 }
 

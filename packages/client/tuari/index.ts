@@ -7,10 +7,6 @@ export class TuariClient extends BaseClient {
 		super();
 	}
 
-	async hello(name?: string | undefined): Promise<string> {
-		return await invoke('hello_wrapper', { name: name || 'from Tauri' });
-	}
-
 	async generate_image(request: GenerateImageRequest): Promise<GenerateImageResponse> {
 		try {
 			const response: GenerateImageResponse = await invoke('generate_image', { request: request });

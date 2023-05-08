@@ -42,6 +42,7 @@ function App({ client }: AppProps) {
 		if (response.error) {
 			setError(response.error.message);
 		} else {
+			setError('');
 			setImages(response.data);
 		}
 		setLoading(false);
@@ -98,7 +99,7 @@ function App({ client }: AppProps) {
 				</div>
 
 				{error && (
-					<div className="mb-6 rounded-lg bg-white p-5 shadow-card transition-shadow duration-200 hover:shadow-large dark:bg-light-dark xs:p-6">
+					<div className="mb-6 mt-4 rounded-lg bg-white p-5 shadow-card transition-shadow duration-200 hover:shadow-large dark:bg-light-dark xs:p-6">
 						<p className="leading-[1.8] text-red-500">{error}</p>
 					</div>
 				)}
