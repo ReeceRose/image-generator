@@ -7,7 +7,7 @@ import ReactDOM from 'react-dom/client';
 const client = new HTTPClient(
 	import.meta.env.DEV
 		? 'http://127.0.0.1:8000'
-		: 'https://7go95vmux6.execute-api.us-east-1.amazonaws.com/production'
+		: 'https://7egdvek4c2.execute-api.us-east-1.amazonaws.com/'
 );
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(

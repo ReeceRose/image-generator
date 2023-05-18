@@ -1,12 +1,13 @@
 build-lambda:
-	cargo lambda build --package lambda --release --arm64
+	cargo lambda build --package lambda --release
 
 deploy-lambda:
-	cargo lambda deploy \
-  	--iam-role ${LAMBDA_ARN} --binary-name lambda rust
+	cargo lambda deploy --binary-name lambda image_generator
 
 build-website:
 	pnpm run build --filter web
 
 deploy-website:
-	aws s3 cp --recursive apps/web/dist/ s3://image-generator
+	npx wrangler pages publish apps/web/dist/
+
+deploy: build-website build-lambda deploy-lambda deploy-website

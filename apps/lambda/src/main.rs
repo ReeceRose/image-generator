@@ -1,19 +1,26 @@
 use std::net::SocketAddr;
 
+use axum::http::StatusCode;
 use axum::routing::post;
 
 use axum::{extract::Json, Router};
 use image_generator_core::GenerateImageRequest;
 use lambda_http::Error;
 use lambda_web::{is_running_on_lambda, run_hyper_on_lambda};
-use serde_json::{json, Value};
+use serde_json::json;
 use tower_http::cors::{Any, CorsLayer};
 use tower_http::trace::{self, TraceLayer};
 use tracing::Level;
 
-async fn generate_image(Json(request): Json<GenerateImageRequest>) -> Json<Value> {
+async fn generate_image(
+    Json(request): Json<GenerateImageRequest>,
+) -> impl axum::response::IntoResponse {
     let response = image_generator_core::generate_image(&request).await;
-    Json(json!(response))
+    return (
+        axum::http::StatusCode::from_u16(response.status_code)
+            .unwrap_or(StatusCode::INTERNAL_SERVER_ERROR),
+        Json(json!(response)),
+    );
 }
 
 async fn fallback(uri: axum::http::Uri) -> impl axum::response::IntoResponse {

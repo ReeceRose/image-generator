@@ -1,8 +1,7 @@
 use serde::{Deserialize, Serialize};
-
 // TODO: use &str in structs?
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GenerateImageRequest {
     pub api_key: String,
@@ -11,8 +10,8 @@ pub struct GenerateImageRequest {
     pub size: String,
 }
 
-#[derive(Serialize, Debug)]
-pub struct OpenAIGenerateImageRequest {
+#[derive(Debug, Serialize, Deserialize)]
+struct OpenAIGenerateImageRequest {
     prompt: String,
     n: u8,
     size: String,
@@ -28,22 +27,32 @@ impl From<&GenerateImageRequest> for OpenAIGenerateImageRequest {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct GenerateImageResponse {
-    pub data: Option<Vec<URL>>,
-    pub error: Option<GenerateImageError>,
+    #[serde(default, skip)]
+    pub status_code: u16,
+    data: Option<Vec<URL>>,
+    error: Option<GenerateImageError>,
 }
 
 impl GenerateImageResponse {
-    fn new(data: Option<Vec<URL>>, error: Option<GenerateImageError>) -> GenerateImageResponse {
-        GenerateImageResponse { data, error }
+    fn new(
+        status_code: u16,
+        data: Option<Vec<URL>>,
+        error: Option<GenerateImageError>,
+    ) -> GenerateImageResponse {
+        GenerateImageResponse {
+            status_code,
+            data,
+            error,
+        }
     }
 }
 
 // TODO: use a new in the above
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct GenerateImageError {
+struct GenerateImageError {
     message: String,
 }
 
@@ -54,7 +63,7 @@ impl GenerateImageError {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct URL {
+struct URL {
     url: String,
 }
 
@@ -71,6 +80,7 @@ pub async fn generate_image(request: &GenerateImageRequest) -> GenerateImageResp
         Ok(response) => response,
         _ => {
             return GenerateImageResponse::new(
+                500,
                 None,
                 Some(GenerateImageError::new(
                     "Failed to make request to OpenAI".to_owned(),
@@ -78,25 +88,25 @@ pub async fn generate_image(request: &GenerateImageRequest) -> GenerateImageResp
             )
         }
     };
-    if let reqwest::StatusCode::OK = response.status() {
-        let json = response.json::<GenerateImageResponse>().await;
-        match json {
-            Ok(data) => return data,
-            _ => {
-                return GenerateImageResponse::new(
-                    None,
-                    Some(GenerateImageError::new(
-                        "Failed to deserialize response.".to_owned(),
-                    )),
-                )
+    // if let reqwest::StatusCode::OK = response.status() {
+    let json = response.json::<GenerateImageResponse>().await;
+    match json {
+        Ok(mut data) => {
+            if data.error.is_some() && data.status_code == 0 {
+                data.status_code = 500
+            } else {
+                data.status_code = 200;
             }
-        };
-    } else {
-        return GenerateImageResponse::new(
-            None,
-            Some(GenerateImageError::new(
-                "Non 200 error code from OpenAI.".to_owned(),
-            )),
-        );
-    }
+            return data;
+        }
+        _ => {
+            return GenerateImageResponse::new(
+                500,
+                None,
+                Some(GenerateImageError::new(
+                    "Failed to deserialize response.".to_owned(),
+                )),
+            );
+        }
+    };
 }
