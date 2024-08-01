@@ -10,7 +10,7 @@ export default function Header() {
 	return (
 		<nav
 			className={
-				'sticky top-0 z-30 h-16 w-full transition-all duration-300 ltr:right-0 rtl:left-0 sm:h-20 3xl:h-24'
+				'sticky top-0 z-30 h-16 w-full transition-all duration-300 sm:h-20 3xl:h-24 ltr:right-0 rtl:left-0'
 			}
 		>
 			<div className="flex h-full items-center justify-end px-4 sm:px-6 lg:px-8 3xl:px-10">
