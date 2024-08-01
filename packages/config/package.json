@@ -6,18 +6,18 @@
 		"lint": "eslint . --cache"
 	},
 	"devDependencies": {
-		"@typescript-eslint/eslint-plugin": "^5.62.0",
-		"@typescript-eslint/parser": "^5.62.0",
-		"@vitejs/plugin-react-swc": "^3.3.2",
-		"eslint": "^8.50.0",
-		"eslint-config-prettier": "^8.10.0",
-		"eslint-config-turbo": "^1.10.14",
+		"@typescript-eslint/eslint-plugin": "^8.0.0",
+		"@typescript-eslint/parser": "^8.0.0",
+		"@vitejs/plugin-react-swc": "^3.7.0",
+		"eslint": "^9.8.0",
+		"eslint-config-prettier": "^9.1.0",
+		"eslint-config-turbo": "^2.0.11",
 		"eslint-plugin-editorconfig": "^4.0.3",
-		"eslint-plugin-prettier": "^4.2.1",
-		"eslint-plugin-react": "^7.33.2",
-		"eslint-plugin-react-hooks": "^4.6.0",
-		"eslint-plugin-tailwindcss": "^3.13.0",
-		"vite": "^4.4.9",
-		"vite-plugin-svgr": "^3.3.0"
+		"eslint-plugin-prettier": "^5.2.1",
+		"eslint-plugin-react": "^7.35.0",
+		"eslint-plugin-react-hooks": "^4.6.2",
+		"eslint-plugin-tailwindcss": "^3.17.4",
+		"vite": "^5.3.5",
+		"vite-plugin-svgr": "^4.2.0"
 	}
 }
