@@ -1,8 +1,7 @@
 import { useTheme } from '../../Context/ThemeContext';
 // @ts-ignore
-import { ReactComponent as MoonLogo } from '../Icons/moon.svg';
-// @ts-ignore
-import { ReactComponent as SunLogo } from '../Icons/sun.svg';
+import MoonLogo from '../Icons/moon';
+import SunLogo from '../Icons/sun';
 
 export default function Header() {
 	const { theme, toggleTheme } = useTheme();
@@ -17,7 +16,6 @@ export default function Header() {
 				<button onClick={toggleTheme} className="inline-block">
 					{theme === 'dark' ? <SunLogo /> : <MoonLogo />}
 				</button>
-				{/* <div>{{ theme.toString() }}</div> */}
 			</div>
 		</nav>
 	);
